@@ -36,27 +36,29 @@ public static func register(with registrar: FlutterPluginRegistrar) {
                                   "flutter arguments in method: (getAttestationServiceSupport)", details: nil))
               return
           }
+          
+          attest.generateKey { key in
+              print(attest.keyIdentifier())
+              
+              attest.preAttestation { success in
+                  
+                  if (success) {
+                      var attestation = [String : String] ()
+                      attestation["attestationString"] = attest.attestationString
+                      attestation["keyID"] = attest.keyIdentifier()
 
-          print(attest.keyIdentifier())
-
-          if attest.preAttestation(){
-              DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                  var attestation = [String : String] ()
-                  attestation["attestationString"] = attest.attestationString
-                  attestation["keyID"] = attest.keyIdentifier()
-
-                  let encoder = JSONEncoder()
-                  if let json = try? encoder.encode(attestation) {
-                      result(String(data: json, encoding: .utf8)!)
+                      let encoder = JSONEncoder()
+                      if let json = try? encoder.encode(attestation) {
+                          result(String(data: json, encoding: .utf8)!)
+                      }
+                  } else {
+                      result(FlutterError(code: "-1", message: "iOS could not extract " +
+                                          "flutter arguments in method: (getAttestationServiceSupport)", details: nil))
+                      return
                   }
-                  
-                  
               }
-          } else {
-              result(FlutterError(code: "-1", message: "iOS could not extract " +
-                                  "flutter arguments in method: (getAttestationServiceSupport)", details: nil))
-              return
           }
+          
     default:
       result(FlutterMethodNotImplemented)
 
