@@ -20,25 +20,25 @@ public static func register(with registrar: FlutterPluginRegistrar) {
           }
 
           guard let myArgs = args as? [String: Any] else {
-              result(FlutterError(code: "-1", message: "iOS could not extract " +
+              result(FlutterError(code: "-2", message: "iOS could not extract " +
                                   "flutter arguments in method: (getAttestationServiceSupport)", details: nil))
               return
           }
 
           guard let challengeString = myArgs["challengeString"] as? String else {
-              result(FlutterError(code: "-1", message: "iOS could not extract " +
+              result(FlutterError(code: "-3", message: "iOS could not extract " +
                                   "flutter arguments in method: (getAttestationServiceSupport)", details: nil))
               return
           }
 
           guard let attest = AppDeviceIntegrity(challengeString: challengeString) else {
-              result(FlutterError(code: "-1", message: "iOS could not extract " +
+              result(FlutterError(code: "-4", message: "iOS could not extract " +
                                   "flutter arguments in method: (getAttestationServiceSupport)", details: nil))
               return
           }
           
           attest.generateKey { key in
-              print(attest.keyIdentifier())
+//              print(attest.keyIdentifier())
               
               attest.preAttestation { success in
                   
@@ -52,7 +52,7 @@ public static func register(with registrar: FlutterPluginRegistrar) {
                           result(String(data: json, encoding: .utf8)!)
                       }
                   } else {
-                      result(FlutterError(code: "-1", message: "iOS could not extract " +
+                      result(FlutterError(code: "-5", message: "iOS could not extract " +
                                           "flutter arguments in method: (getAttestationServiceSupport)", details: nil))
                       return
                   }

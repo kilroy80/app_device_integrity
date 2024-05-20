@@ -27,7 +27,7 @@ final class AppDeviceIntegrity {
     private var keyID: String? {
         didSet
         {
-            print("🐝 Key ID:", keyID!)
+//             print("🐝 Key ID:", keyID!)
         }
     }
     
@@ -43,7 +43,10 @@ final class AppDeviceIntegrity {
     func generateKey(completion: @escaping (String?)->()) {
         guard let id = userDefaults.object(forKey:keyName) as? String else {
             attestService.generateKey { keyIdentifier, error in
-                guard error == nil, keyIdentifier != nil else { return }
+                guard error == nil, keyIdentifier != nil else {
+                    completion(nil)
+                    return
+                }
                 self.keyID = keyIdentifier
                 if self.keyID != nil {
                     print("🐝 Generated key")
@@ -78,9 +81,13 @@ final class AppDeviceIntegrity {
             }
             self.attestationString = attestation?.base64EncodedString()
             let decodedData: Data? = Data(base64Encoded: attestationObject.base64EncodedData(), options: .ignoreUnknownCharacters)
-            guard let finalDecodedData = decodedData else { return }
+            guard let finalDecodedData = decodedData else {
+                completion(false)
+                return
+            }
             
             guard let decodedAttestation = String(data: finalDecodedData.base64EncodedData(), encoding: .utf8) else {
+                completion(false)
                 return
             }
             
