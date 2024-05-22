@@ -36,7 +36,7 @@ class AppDeviceIntegrityPlugin: FlutterPlugin, MethodCallHandler, ActivityAware 
           result.success(integrityToken.toString())
         }.addOnFailureListener { e ->
           println("integrityToken Error:="+e)
-          result.error("-1", "integrityToken Error: (getAttestationServiceSupport)", null)
+          result.error("-1", "integrityToken Error: (getAttestationServiceSupport)", "error")
         }
 
       }
