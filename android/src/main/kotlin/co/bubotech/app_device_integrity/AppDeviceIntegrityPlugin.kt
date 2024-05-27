@@ -2,7 +2,6 @@ package co.bubotech.app_device_integrity
 
 import android.app.Activity
 import android.content.Context
-import androidx.annotation.NonNull
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -16,21 +15,21 @@ import io.flutter.plugin.common.MethodChannel.Result
 class AppDeviceIntegrityPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
   private lateinit var channel: MethodChannel
-  private lateinit var context: Context
+//  private lateinit var context: Context
   private lateinit var activity: Activity
 
   override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     channel = MethodChannel(flutterPluginBinding.binaryMessenger, "app_attestation")
     channel.setMethodCallHandler(this)
-    context = flutterPluginBinding.applicationContext
+//    context = flutterPluginBinding.applicationContext
   }
 
   override fun onMethodCall(call: MethodCall, result: Result) {
     if (call.method == "getAttestationServiceSupport") {
-      var challenge: String?
-      if (call.argument<Long>("gcp") != null) {
-        challenge = call.argument<String>("challengeString").toString()
-        var attestation: AppDeviceIntegrity = AppDeviceIntegrity(context,call.argument<Long>("gcp")!!)
+      val challenge: String = call.argument("challengeString") ?: ""
+      val gcp: Long = call.argument("gcp") ?: 0
+      if (gcp > 0) {
+        val attestation: AppDeviceIntegrity = AppDeviceIntegrity(activity as Context, gcp)
         attestation.integrityTokenResponse.addOnSuccessListener { response ->
           val integrityToken: String = response.token()
           result.success(integrityToken.toString())
@@ -38,7 +37,6 @@ class AppDeviceIntegrityPlugin: FlutterPlugin, MethodCallHandler, ActivityAware 
           println("integrityToken Error:="+e)
           result.error("integrityToken Error", "Error: (getAttestationServiceSupport)", null)
         }
-
       }
     } else {
       result.notImplemented()
@@ -58,7 +56,7 @@ class AppDeviceIntegrityPlugin: FlutterPlugin, MethodCallHandler, ActivityAware 
   }
 
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-    activity = binding.activity;
+    activity = binding.activity
   }
 
   override fun onDetachedFromActivityForConfigChanges() {
